@@ -12,7 +12,8 @@ pip install -r requirements.txt
 
 Run local dev server
 ```bash
-export FLASK_APP=foo.py
+export FLASK_APP=app.py
+export FLASK_ENV=development
 flask run
 ```
 
