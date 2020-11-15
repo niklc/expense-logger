@@ -5,8 +5,8 @@
 </head>
 <body>
     <form action="post-expense" method="post">
-        <input type="number" name="ammount" required>
-        <input type="text" name="description" required>
+        <input name="amount" type="number" min="0" step="0.01" required>
+        <input name="description" type="text" required>
         <input type="submit">
     </form>
 </body>
