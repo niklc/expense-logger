@@ -1,7 +1,7 @@
-from expense_logger import sheets_test, login_sheets
+from expense_logger import sheets_test, sheets_login
 
 def main():
-    login_sheets.login()
+    sheets_login.login()
 
     sheet = sheets_test.get_sheet()
 
