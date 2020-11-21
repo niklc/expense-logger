@@ -1,7 +1,7 @@
 from flask import Flask, request, abort, url_for, redirect
-from src.LogService import LogService
+from expense_logger.LogService import LogService
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="../static")
 
 @app.route('/')
 def form_log_expense():

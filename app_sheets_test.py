@@ -1,12 +1,11 @@
-import src.sheets_test
-import src.login_sheets
+from expense_logger import sheets_test, login_sheets
 
 def main():
-    src.login_sheets.login()
+    login_sheets.login()
 
-    sheet = src.sheets_test.get_sheet()
+    sheet = sheets_test.get_sheet()
 
-    src.sheets_test.get_sheet_data(sheet)
+    sheets_test.get_sheet_data(sheet)
 
 if __name__ == '__main__':
     main()
