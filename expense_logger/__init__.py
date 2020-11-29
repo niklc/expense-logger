@@ -14,7 +14,7 @@ app.secret_key = 'random secret key 123'  # TODO
 
 @app.route('/')
 def index():
-    if credentials.isCredentialsSet():
+    if not credentials.isCredentialsSet():
         return flask.redirect('authorize')
 
     return flask.render_template('index.html')
@@ -22,7 +22,7 @@ def index():
 
 @app.route('/post-expense', methods=['POST'])
 def post_expense():
-    if credentials.isCredentialsSet():
+    if not credentials.isCredentialsSet():
         flask.abort(401)
 
     try:

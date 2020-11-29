@@ -1,20 +1,21 @@
 import flask
 
+KEY = 'credentials'
 
 def isCredentialsSet():
-    if 'credentials' in flask.session:
+    if KEY in flask.session:
         return True
 
     return False
 
 
 def getCredentials():
-    return flask.session['credentials']
+    return flask.session[KEY]
 
 
 def setCredentials(credentials):
-    flask.session['credentials'] = credentials
+    flask.session[KEY] = credentials
 
 
 def deleteCredentials():
-    del flask.session['credentials']
+    del flask.session[KEY]
