@@ -1,19 +1,11 @@
 import os
 
 import flask
-import googleapiclient.discovery
-import google_auth_oauthlib.flow
-import google.oauth2.credentials
 
+from expense_logger import google_services
 
-CLIENT_SECRETS_FILE = 'credentials.json'
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-
-# see https://developers.google.com/sheets/api/reference/rest/v4/ValueInputOption
-SHEETS_VALUE_INPUT_OPTION = 'RAW'  # USER_ENTERED
 
 SPREADSHEET_ID = '1NMknWqv4PQdhsbpzWA3xCBaIfM95Uo10M-EL3KXl4ak'
-SPREADSHEET_RANGE = 'Sheet1'
 
 
 app = flask.Flask(__name__, static_folder='../static')
@@ -39,42 +31,18 @@ def post_expense():
     except ValueError:
         flask.abort(400)
 
-    credentials = google.oauth2.credentials.Credentials(
-        **flask.session['credentials'])
-
-    # pylint: disable=maybe-no-member
-    sheet = googleapiclient.discovery.build(
-        'sheets', 'v4', credentials=credentials).spreadsheets()
+    sheet = google_services.get_sheet(flask.session['credentials'])
 
     row = [amount, description]
 
-    body = {
-        'values': [
-            row
-        ]
-    }
-
-    sheet.values().append(
-        spreadsheetId=SPREADSHEET_ID,
-        range=SPREADSHEET_RANGE,
-        valueInputOption=SHEETS_VALUE_INPUT_OPTION,
-        body=body
-    ).execute()
+    google_services.append_row(sheet, SPREADSHEET_ID, row)
 
     return flask.redirect(flask.url_for('index'))
 
 
 @app.route('/authorize')
 def authorize():
-    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE, scopes=SCOPES)
-
-    flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
-
-    authorization_url, state = flow.authorization_url(
-        access_type='online',
-        include_granted_scopes='false'
-    )
+    authorization_url, state = google_services.authorize(get_oauth_callback_url())
 
     flask.session['state'] = state
 
@@ -85,14 +53,10 @@ def authorize():
 def oauth2callback():
     state = flask.session['state']
 
-    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
-    flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
-
     authorization_response = flask.request.url
-    flow.fetch_token(authorization_response=authorization_response)
 
-    credentials = flow.credentials
+    credentials = google_services.oauth_callback(get_oauth_callback_url(), state, authorization_response)
+
     flask.session['credentials'] = credentials_to_dict(credentials)
 
     return flask.redirect(flask.url_for('index'))
@@ -105,6 +69,9 @@ def clear_credentials():
 
     return flask.redirect(flask.url_for('index'))
 
+
+def get_oauth_callback_url():
+    return flask.url_for('oauth2callback', _external=True)
 
 def credentials_to_dict(credentials):
     return {
