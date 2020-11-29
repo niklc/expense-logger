@@ -49,8 +49,8 @@ def authorize():
     return flask.redirect(authorization_url)
 
 
-@app.route('/oauth2callback')
-def oauth2callback():
+@app.route('/authorize-callback')
+def oauth2_callback():
     state = flask.session['state']
 
     authorization_response = flask.request.url
@@ -75,4 +75,4 @@ def clear_credentials():
 
 
 def get_oauth_callback_url():
-    return flask.url_for('oauth2callback', _external=True)
+    return flask.url_for('oauth2_callback', _external=True)
