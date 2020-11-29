@@ -2,10 +2,10 @@ import os
 
 import flask
 
-from expense_logger import google_services
+from expense_logger import oauth, spreadsheet
 
 
-SPREADSHEET_ID = '1NMknWqv4PQdhsbpzWA3xCBaIfM95Uo10M-EL3KXl4ak'
+PLACEHOLDER_SPREADSHEET_ID = '1NMknWqv4PQdhsbpzWA3xCBaIfM95Uo10M-EL3KXl4ak'
 
 
 app = flask.Flask(__name__, static_folder='../static')
@@ -31,18 +31,18 @@ def post_expense():
     except ValueError:
         flask.abort(400)
 
-    sheet = google_services.get_sheet(flask.session['credentials'])
-
     row = [amount, description]
 
-    google_services.append_row(sheet, SPREADSHEET_ID, row)
+    credentials = flask.session['credentials']
+    spreadsheet.append_row(credentials, PLACEHOLDER_SPREADSHEET_ID, row)
 
     return flask.redirect(flask.url_for('index'))
 
 
 @app.route('/authorize')
 def authorize():
-    authorization_url, state = google_services.authorize(get_oauth_callback_url())
+    authorization_url, state = oauth.get_request_token(
+        get_oauth_callback_url())
 
     flask.session['state'] = state
 
@@ -55,9 +55,10 @@ def oauth2callback():
 
     authorization_response = flask.request.url
 
-    credentials = google_services.oauth_callback(get_oauth_callback_url(), state, authorization_response)
+    credentials = oauth.get_access_token(
+        get_oauth_callback_url(), state, authorization_response)
 
-    flask.session['credentials'] = credentials_to_dict(credentials)
+    flask.session['credentials'] = credentials
 
     return flask.redirect(flask.url_for('index'))
 
@@ -72,13 +73,3 @@ def clear_credentials():
 
 def get_oauth_callback_url():
     return flask.url_for('oauth2callback', _external=True)
-
-def credentials_to_dict(credentials):
-    return {
-        'token': credentials.token,
-        'refresh_token': credentials.refresh_token,
-        'token_uri': credentials.token_uri,
-        'client_id': credentials.client_id,
-        'client_secret': credentials.client_secret,
-        'scopes': credentials.scopes
-    }
