@@ -2,7 +2,7 @@ import os
 
 import flask
 
-from expense_logger import oauth, spreadsheet
+from expense_logger import oauth, spreadsheet, credentials
 
 
 PLACEHOLDER_SPREADSHEET_ID = '1NMknWqv4PQdhsbpzWA3xCBaIfM95Uo10M-EL3KXl4ak'
@@ -14,7 +14,7 @@ app.secret_key = 'random secret key 123'  # TODO
 
 @app.route('/')
 def index():
-    if 'credentials' not in flask.session:
+    if credentials.isCredentialsSet():
         return flask.redirect('authorize')
 
     return flask.render_template('index.html')
@@ -22,7 +22,7 @@ def index():
 
 @app.route('/post-expense', methods=['POST'])
 def post_expense():
-    if 'credentials' not in flask.session:
+    if credentials.isCredentialsSet():
         flask.abort(401)
 
     try:
@@ -33,8 +33,7 @@ def post_expense():
 
     row = [amount, description]
 
-    credentials = flask.session['credentials']
-    spreadsheet.append_row(credentials, PLACEHOLDER_SPREADSHEET_ID, row)
+    spreadsheet.append_row(PLACEHOLDER_SPREADSHEET_ID, row)
 
     return flask.redirect(flask.url_for('index'))
 
@@ -42,7 +41,8 @@ def post_expense():
 @app.route('/authorize')
 def authorize():
     authorization_url, state = oauth.get_request_token(
-        get_oauth_callback_url())
+        get_oauth_callback_url()
+    )
 
     flask.session['state'] = state
 
@@ -55,18 +55,21 @@ def oauth2callback():
 
     authorization_response = flask.request.url
 
-    credentials = oauth.get_access_token(
-        get_oauth_callback_url(), state, authorization_response)
+    response_credentials = oauth.get_access_token(
+        get_oauth_callback_url(),
+        state,
+        authorization_response
+    )
 
-    flask.session['credentials'] = credentials
+    credentials.setCredentials(response_credentials)
 
     return flask.redirect(flask.url_for('index'))
 
 
 @app.route('/clear')
 def clear_credentials():
-    if 'credentials' in flask.session:
-        del flask.session['credentials']
+    if credentials.isCredentialsSet():
+        credentials.revokeCredentials()
 
     return flask.redirect(flask.url_for('index'))
 
