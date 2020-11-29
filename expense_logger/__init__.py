@@ -69,7 +69,7 @@ def oauth2callback():
 @app.route('/clear')
 def clear_credentials():
     if credentials.isCredentialsSet():
-        credentials.revokeCredentials()
+        credentials.deleteCredentials()
 
     return flask.redirect(flask.url_for('index'))
 

@@ -16,5 +16,5 @@ def setCredentials(credentials):
     flask.session['credentials'] = credentials
 
 
-def revokeCredentials():
+def deleteCredentials():
     del flask.session['credentials']
