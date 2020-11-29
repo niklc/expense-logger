@@ -31,7 +31,7 @@ def index():
 @app.route('/post-expense', methods=['POST'])
 def post_expense():
     if 'credentials' not in flask.session:
-        return flask.redirect('authorize')
+        flask.abort(401)
 
     try:
         amount = float(flask.request.form['amount'])
