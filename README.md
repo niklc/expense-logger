@@ -24,3 +24,5 @@ OAuth 2.0 local testing
 ```bash
 export OAUTHLIB_INSECURE_TRANSPORT=1
 ```
+
+Generate `credentials.json` file for Google API access. See https://developers.google.com/sheets/api/quickstart/python#step_1_turn_on_the. 
