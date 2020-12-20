@@ -1,13 +1,16 @@
 FROM ubuntu:20.04
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && \
-    apt-get install -y python3-pip
+    apt-get install -y python3-pip nginx
 
-RUN pip3 install uwsgi==2.0.18 flask==1.1.2
+COPY ./ ./app
+WORKDIR /app
 
-COPY wsgi.py app/wsgi.py
+RUN pip3 install -r requirements.txt
 
-EXPOSE 8080
+COPY ./nginx.conf /etc/nginx/sites-enabled/default
 
-# cd app
-# uwsgi --socket :8080 --protocol=http -w wsgi
+CMD service nginx start && \
+    uwsgi -s /tmp/uwsgi.sock --chmod-socket=666 --manage-script-name --mount /=expense_logger:app
