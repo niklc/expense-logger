@@ -20,4 +20,4 @@ export FLASK_APP=expense_logger && export FLASK_ENV=development && export OAUTHL
 flask run
 ```
 
-Generate `credentials.json` file for Google API access. See https://developers.google.com/sheets/api/quickstart/python#step_1_turn_on_the. 
+Generate `credentials.json` file for Google API access. See https://developers.google.com/sheets/api/quickstart/python#step_1_turn_on_the.
