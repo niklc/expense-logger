@@ -27,7 +27,7 @@ def append_row(sheet_id, row):
 
 def _get_sheet():
     google_credentials = google.oauth2.credentials.Credentials(
-        **credentials.getCredentials()
+        **credentials.get_credentials()
     )
 
     # pylint: disable=maybe-no-member

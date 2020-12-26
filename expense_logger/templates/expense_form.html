@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+<form action="post-expense" method="post">
+    <div class="mb-3">
+        <label for="amount" class="form-label">Ammount</label>
+        <input name="amount" id="amount" required autocomplete="off" type="number" min="0" step="0.01" autofocus class="form-control">
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <input name="description" id="description" required autocomplete="off" type="text" class="form-control">
+    </div>
+    <div class="d-grid col-6 mx-auto">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
+{% endblock %}
