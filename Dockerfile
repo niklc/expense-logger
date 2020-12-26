@@ -22,7 +22,7 @@ RUN pip3 install -r requirements.txt
 
 COPY ./expense_logger ./expense_logger
 COPY ./static ./static
-COPY ./credentials.json ./
+COPY ./.env ./credentials.json ./
 
 CMD service nginx start && \
     uwsgi -s /tmp/uwsgi.sock --chmod-socket=666 --manage-script-name --mount /=expense_logger:app
