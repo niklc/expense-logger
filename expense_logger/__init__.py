@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 from pytz import timezone
+from time import time
 
 import flask
 
@@ -33,9 +34,10 @@ def post_expense():
     except ValueError:
         flask.abort(400)
 
-    entry_datetime = datetime.now().astimezone(timezone('Europe/Riga')).strftime('%Y-%m-%d %H:%M:%S')
+    timestamp = int(time())
+    entry_datetime_with_timezone = datetime.now().astimezone(timezone('Europe/Riga')).strftime('%Y-%m-%d %H:%M:%S')
 
-    row = [entry_datetime, amount, description]
+    row = [timestamp, entry_datetime_with_timezone, amount, description]
 
     spreadsheet.append_row(PLACEHOLDER_SPREADSHEET_ID, row)
 
