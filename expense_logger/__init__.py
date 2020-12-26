@@ -4,12 +4,15 @@ from pytz import timezone
 from time import time
 
 import flask
+import dotenv
 
 from expense_logger import oauth, spreadsheet, credentials, spreadsheet_id
 
 
+dotenv.load_dotenv()
+
 app = flask.Flask(__name__, static_folder='../static')
-app.secret_key = 'random secret key 123'  # TODO
+app.secret_key = os.getenv('SECRET_KEY')
 
 
 @app.route('/')
