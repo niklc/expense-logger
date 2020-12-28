@@ -5,16 +5,27 @@ services:
     image: expense-logger-app
     build:
       context: .
-      dockerfile: Dockerfile-app
+      dockerfile: app.Dockerfile
     expose:
       - "5000"
   nginx:
     image: expense-logger-nginx
     build:
       context: .
-      dockerfile: Dockerfile-nginx
+      dockerfile: nginx.Dockerfile
+      args:
+        EMAIL: ${EMAIL}
+        DOMAIN: ${DOMAIN}
     ports:
       - 80:80
       - 443:443
+    volumes:
+      - web-root:/var/www/certbot
     depends_on:
       - app
+    environment:
+      DOMAIN: ${DOMAIN}
+
+volumes:
+  certbot-etc:
+  web-root:
