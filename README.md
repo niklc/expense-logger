@@ -1,23 +1,22 @@
-Set-up
+### To run development environment locally
+
+Generate `credentials.json` file for Google API access. Callback URI should be https://localhost/authorize-callback. See https://developers.google.com/sheets/api/quickstart/python#step_1_turn_on_the.
+
+Copy `.env.example` to `.env` and fill it's keys.
+
+Run:
 ```bash
-python3 -m venv venv
-pip install -r requirements.txt
+docker-compose up
 ```
 
-Activate venv
+### Production
+
+Get SSL certificate:
 ```bash
-source venv/bin/activate
+docker-compose -f docker-compose.yml -f docker-compose.get-certificates.yml up
 ```
 
-Deactivate venv
+Run:
 ```bash
-deactivate
+docker-compose -f docker-compose.yml -f docker-compose.production.yml up -d
 ```
-
-Run local dev server
-```bash
-export FLASK_APP=expense_logger && export FLASK_ENV=development && export OAUTHLIB_INSECURE_TRANSPORT=1
-flask run
-```
-
-Generate `credentials.json` file for Google API access. See https://developers.google.com/sheets/api/quickstart/python#step_1_turn_on_the.

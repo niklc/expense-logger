@@ -12,5 +12,3 @@ COPY ./static ./static
 COPY ./.env ./credentials.json ./
 
 COPY ./docker/app.ini ./
-
-CMD [ "uwsgi", "--ini", "app.ini" ]

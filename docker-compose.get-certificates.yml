@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  app:
+  nginx:
+    image: ${IMAGE_REPOSITORY}/expense-logger-nginx:${IMAGE_VERSION}-certificate
+    volumes:
+      - web-ssl-challange:/var/www/certbot
+  certbot:
+    image: certbot/certbot
+    container_name: expense-logger-certbot
+    volumes:
+      - web-ssl-challange:/var/www/certbot
+      - ssl-certificates:/etc/letsencrypt
+    depends_on:
+      - nginx
+    command: "certonly --webroot --webroot-path=/var/www/certbot --email ${EMAIL} --agree-tos --staging --no-eff-email -d ${DOMAIN}"
+
+volumes:
+  web-ssl-challange:
+  ssl-certificates:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PATH_CERTIFICATES}
+      o: bind

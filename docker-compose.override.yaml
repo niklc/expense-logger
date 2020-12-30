@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  app:
+    volumes:
+      - ./:/app
+    command: "uwsgi --ini docker/app.ini --py-autoreload 1"
+  nginx:
+    image: ${IMAGE_REPOSITORY}/expense-logger-nginx:${IMAGE_VERSION}-local
+    build:
+      args:
+        DOMAIN: localhost
+    environment:
+      DOMAIN: localhost
+      FLASK_ENV: development
+      OAUTHLIB_INSECURE_TRANSPORT: 1

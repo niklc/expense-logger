@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  app:
+    restart: always
+  nginx:
+    restart: always
+    build:
+      args:
+        IS_PRODUCTION: "true"
+    volumes:
+      - web-ssl-challange:/var/www/certbot
+      - ssl-certificates:/etc/letsencrypt
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+  certbot:
+    image: certbot/certbot
+    container_name: expense-logger-certbot
+    restart: always
+    volumes:
+      - web-ssl-challange:/var/www/certbot
+      - ssl-certificates:/etc/letsencrypt
+    depends_on:
+      - nginx
+    command: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+volumes:
+  web-ssl-challange:
+  ssl-certificates:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PATH_CERTIFICATES}
+      o: bind

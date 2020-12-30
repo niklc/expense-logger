@@ -2,30 +2,27 @@ version: '3'
 
 services:
   app:
-    image: expense-logger-app
+    image: ${IMAGE_REPOSITORY}/expense-logger-app:${IMAGE_VERSION}
+    container_name: expense-logger-app
     build:
       context: .
       dockerfile: app.Dockerfile
     expose:
       - "5000"
+    command: "uwsgi --ini app.ini"
   nginx:
-    image: expense-logger-nginx
+    image: ${IMAGE_REPOSITORY}/expense-logger-nginx:${IMAGE_VERSION}
+    container_name: expense-logger-nginx
     build:
       context: .
       dockerfile: nginx.Dockerfile
       args:
         EMAIL: ${EMAIL}
         DOMAIN: ${DOMAIN}
+    environment:
+      DOMAIN: ${DOMAIN}
     ports:
       - 80:80
       - 443:443
-    volumes:
-      - web-root:/var/www/certbot
     depends_on:
       - app
-    environment:
-      DOMAIN: ${DOMAIN}
-
-volumes:
-  certbot-etc:
-  web-root:
