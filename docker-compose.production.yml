@@ -11,17 +11,15 @@ services:
     volumes:
       - web-ssl-challange:/var/www/certbot
       - ssl-certificates:/etc/letsencrypt
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
   certbot:
     image: certbot/certbot
     container_name: expense-logger-certbot
-    restart: always
     volumes:
       - web-ssl-challange:/var/www/certbot
       - ssl-certificates:/etc/letsencrypt
     depends_on:
       - nginx
-    command: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    command: certonly --webroot --webroot-path=/var/www/certbot --email ${EMAIL} --agree-tos --no-eff-email --force-renewal -d ${DOMAIN}
 
 volumes:
   web-ssl-challange:

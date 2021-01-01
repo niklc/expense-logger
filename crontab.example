@@ -1,0 +1,1 @@
+0 12 * * * /home/user/ssl_renew.sh >> /home/user/ssl_renew.log 2>&1

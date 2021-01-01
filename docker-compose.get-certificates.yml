@@ -14,7 +14,7 @@ services:
       - ssl-certificates:/etc/letsencrypt
     depends_on:
       - nginx
-    command: "certonly --webroot --webroot-path=/var/www/certbot --email ${EMAIL} --agree-tos --staging --no-eff-email -d ${DOMAIN}"
+    command: certonly --webroot --webroot-path=/var/www/certbot --email ${EMAIL} --agree-tos --no-eff-email -d ${DOMAIN}
 
 volumes:
   web-ssl-challange:
