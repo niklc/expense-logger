@@ -15,6 +15,11 @@ app = flask.Flask(__name__, static_folder='../static')
 app.secret_key = os.getenv('SECRET_KEY')
 
 
+@app.before_request
+def make_session_permanent():
+    flask.session.permanent = True
+
+
 @app.route('/')
 def expense_form():
     if not credentials.is_credentials_set():
