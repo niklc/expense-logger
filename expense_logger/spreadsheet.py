@@ -3,6 +3,7 @@ import google.oauth2.credentials
 
 from expense_logger import credentials
 
+
 SHEETS_VALUE_INPUT_OPTION = 'RAW'
 
 SPREADSHEET_RANGE = 'Sheet1'

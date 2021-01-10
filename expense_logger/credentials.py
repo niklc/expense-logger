@@ -1,6 +1,8 @@
 from flask import session
 
+
 KEY = 'credentials'
+
 
 def is_credentials_set():
     if KEY in session:

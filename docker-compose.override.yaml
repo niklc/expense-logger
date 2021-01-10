@@ -2,6 +2,8 @@ version: '3'
 
 services:
   app:
+    environment:
+      FLASK_ENV: development
     volumes:
       - ./:/app
     command: "uwsgi --ini docker/app.ini --py-autoreload 1"
@@ -12,5 +14,3 @@ services:
         DOMAIN: localhost
     environment:
       DOMAIN: localhost
-      FLASK_ENV: development
-      OAUTHLIB_INSECURE_TRANSPORT: 1

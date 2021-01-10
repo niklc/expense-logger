@@ -14,7 +14,7 @@ def get_request_token(redirect_uri):
     flow.redirect_uri = redirect_uri
 
     return flow.authorization_url(
-        access_type='online',
+        access_type='offline',
         include_granted_scopes='false'
     )
 
