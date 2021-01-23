@@ -1,6 +1,6 @@
 from flask import session
 
-from expense_logger import credentials, db
+from expense_logger import db
 
 def process_user(response_credentials):
     session['credentials'] = response_credentials
