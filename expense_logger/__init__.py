@@ -4,9 +4,10 @@ from pytz import timezone
 from time import time
 
 import flask
+from flask import session
 import dotenv
 
-from expense_logger import oauth, spreadsheet, credentials, spreadsheet_id, db, user
+from expense_logger import oauth, spreadsheet, db, user
 
 
 dotenv.load_dotenv()
@@ -28,9 +29,9 @@ def make_session_permanent():
 
 @app.route('/')
 def expense_form():
-    if not credentials.is_credentials_set():
+    if not 'credentials' in session:
         return flask.redirect(flask.url_for('authorize'))
-    elif not spreadsheet_id.is_spreadsheet_id_set():
+    elif not 'spreadsheet_id' in session:
         return flask.redirect(flask.url_for('spreadsheet_form'))
 
     return flask.render_template('expense_form.html')
@@ -38,7 +39,7 @@ def expense_form():
 
 @app.route('/post-expense', methods=['POST'])
 def post_expense():
-    if not credentials.is_credentials_set():
+    if not 'credentials' in session:
         flask.abort(401)
 
     try:
@@ -47,7 +48,7 @@ def post_expense():
     except ValueError:
         flask.abort(400)
 
-    entry_spreadsheet_id = spreadsheet_id.get_spreadsheet_id()
+    entry_spreadsheet_id = session['spreadsheet_id']
 
     timestamp = int(time())
     entry_datetime_with_timezone = datetime.now().astimezone(
@@ -67,10 +68,10 @@ def spreadsheet_form():
 
 @app.route('/set-spreadsheet', methods=['POST'])
 def set_spreadsheet():
-    if not credentials.is_credentials_set():
+    if not 'credentials' in session:
         flask.abort(401)
 
-    spreadsheet_id.set_spreadsheet_id(flask.request.form['spreadsheet_id'])
+    session['spreadsheet_id'] = flask.request.form['spreadsheet_id']
 
     return flask.redirect(flask.url_for('expense_form'))
 
@@ -105,11 +106,11 @@ def oauth2_callback():
 
 @app.route('/clear')
 def clear_credentials():
-    if credentials.is_credentials_set():
-        credentials.delete_credentials()
+    if 'credentials' in session:
+        del session['credentials']
 
-    if spreadsheet_id.is_spreadsheet_id_set():
-        spreadsheet_id.delete_spreadsheet_id()
+    if 'spreadsheet_id' in session:
+        del session['spreadsheet_id']
 
     return flask.redirect(flask.url_for('expense_form'))
 

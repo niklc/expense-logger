@@ -1,7 +1,6 @@
 import googleapiclient.discovery
 import google.oauth2.credentials
-
-from expense_logger import credentials
+from flask import session
 
 
 SHEETS_VALUE_INPUT_OPTION = 'RAW'
@@ -28,7 +27,7 @@ def append_row(sheet_id, row):
 
 def _get_sheet():
     google_credentials = google.oauth2.credentials.Credentials(
-        **credentials.get_credentials()
+        **session['credentials']
     )
 
     # pylint: disable=maybe-no-member

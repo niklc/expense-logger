@@ -1,9 +1,9 @@
-import flask
+from flask import session
 
 from expense_logger import credentials, db
 
 def process_user(response_credentials):
-    credentials.set_credentials(response_credentials)
+    session['credentials'] = response_credentials
 
     user_data = _get_existing_user_data(response_credentials['user_id'])
     if user_data:
@@ -20,13 +20,13 @@ def _get_existing_user_data(user_id):
 
 
 def _set_session(user_data):
-    flask.session['credentials']['refresh_token'] = user_data['refresh_token']
+    session['credentials']['refresh_token'] = user_data['refresh_token']
 
     if 'spreadsheet_id' in user_data:
-        flask.session['spreadsheet_id'] = user_data['spreadsheet_id']
+        session['spreadsheet_id'] = user_data['spreadsheet_id']
 
     if 'sheet_id' in user_data:
-        flask.session['sheet_id'] = user_data['sheet_id']
+        session['sheet_id'] = user_data['sheet_id']
 
 
 def _save_user(credentials):
