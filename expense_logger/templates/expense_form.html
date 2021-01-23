@@ -1,4 +1,9 @@
 {% extends "layout.html" %}
+
+{% block nav_icon %}
+<a href="spreadsheet-config" class="icon-nav icon-right"><i class="bi bi-gear"></i></a>
+{% endblock %}
+
 {% block content %}
 <form action="post-expense" method="post">
     <div class="mb-3">

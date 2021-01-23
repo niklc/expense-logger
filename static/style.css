@@ -1,7 +1,25 @@
-html {
+html, body, .adjustment-height {
     height: 100%;
 }
 
-body {
-    height: 100%;
+.adjustment-width > div {
+    width: 100%;
+}
+
+.balance {
+    position: relative;
+    height: 80px
+}
+
+.icon-nav {
+    position: absolute;
+    bottom: 0;
+}
+
+.icon-nav > i {
+    font-size: 22px;
+}
+
+.icon-right {
+    right: 0;
 }

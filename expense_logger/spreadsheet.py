@@ -5,10 +5,8 @@ from flask import session
 
 SHEETS_VALUE_INPUT_OPTION = 'RAW'
 
-SPREADSHEET_RANGE = 'Sheet1'
 
-
-def append_row(sheet_id, row):
+def append_row(spreadsheet_id, sheet_id, row):
     sheet = _get_sheet()
 
     body = {
@@ -18,8 +16,8 @@ def append_row(sheet_id, row):
     }
 
     sheet.values().append(
-        spreadsheetId=sheet_id,
-        range=SPREADSHEET_RANGE,
+        spreadsheetId=spreadsheet_id,
+        range=sheet_id,
         valueInputOption=SHEETS_VALUE_INPUT_OPTION,
         body=body
     ).execute()

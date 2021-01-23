@@ -10,6 +10,9 @@ import dotenv
 from expense_logger import oauth, spreadsheet, db, user
 
 
+GOOGLE_SHEETS_DEFAULT_SHEET_ID = 'Sheet1'
+
+
 dotenv.load_dotenv()
 
 app = flask.Flask(__name__, static_folder='../static')
@@ -31,8 +34,8 @@ def make_session_permanent():
 def expense_form():
     if not 'credentials' in session:
         return flask.redirect(flask.url_for('authorize'))
-    elif not 'spreadsheet_id' in session:
-        return flask.redirect(flask.url_for('spreadsheet_form'))
+    elif not is_set_sheets_config():
+        return flask.redirect(flask.url_for('render_spreadsheet_config'))
 
     return flask.render_template('expense_form.html')
 
@@ -56,22 +59,46 @@ def post_expense():
 
     row = [timestamp, entry_datetime_with_timezone, amount, description]
 
-    spreadsheet.append_row(entry_spreadsheet_id, row)
+    spreadsheet.append_row(entry_spreadsheet_id, session['sheet_id'], row)
 
     return flask.redirect(flask.url_for('expense_form'))
 
 
-@app.route('/set-spreadsheet', methods=['GET'])
-def spreadsheet_form():
-    return flask.render_template('spreadsheet_id_form.html')
+@app.route('/spreadsheet-config', methods=['GET'])
+def render_spreadsheet_config():
+    if is_set_sheets_config():
+        can_return = True
+        spreadsheet_id = session['spreadsheet_id']
+        sheet_id = session['sheet_id']
+    else:
+        can_return = False
+        spreadsheet_id = ''
+        sheet_id = GOOGLE_SHEETS_DEFAULT_SHEET_ID
+
+    return flask.render_template(
+        'spreadsheet_config.html',
+        can_return=can_return,
+        spreadsheet_id=spreadsheet_id,
+        sheet_id=sheet_id
+    )
 
 
-@app.route('/set-spreadsheet', methods=['POST'])
-def set_spreadsheet():
+@app.route('/spreadsheet-config', methods=['POST'])
+def set_spreadsheet_config():
     if not 'credentials' in session:
         flask.abort(401)
 
-    session['spreadsheet_id'] = flask.request.form['spreadsheet_id']
+    spreadsheet_id = flask.request.form['spreadsheet_id']
+    sheet_id = flask.request.form['sheet_id']
+
+    session['spreadsheet_id'] = spreadsheet_id
+    session['sheet_id'] = sheet_id
+
+    user.set_sheet_config(
+        session['credentials']['user_id'],
+        spreadsheet_id,
+        sheet_id
+    )
 
     return flask.redirect(flask.url_for('expense_form'))
 
@@ -112,7 +139,17 @@ def clear_credentials():
     if 'spreadsheet_id' in session:
         del session['spreadsheet_id']
 
+    if 'sheet_id' in session:
+        del session['sheet_id']
+
     return flask.redirect(flask.url_for('expense_form'))
+
+
+def is_set_sheets_config():
+    if 'spreadsheet_id' in session and 'sheet_id' in session:
+        return True
+    else:
+        return False
 
 
 def get_oauth_callback_url():

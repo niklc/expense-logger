@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block nav_icon %}
+    {% if can_return %}
+    <a href="/" class="icon-nav"><i class="bi bi-arrow-left-square"></i></a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<form action="spreadsheet-config" method="post">
+    <h3>Google Sheets config</h3>
+    <p>On how to find both IDs see <a href="https://developers.google.com/sheets/api/guides/concepts#sheet_id">Google guide</a>.</p>
+    <div class="mb-3">
+        <label for="spreadsheet_id" class="form-label">Spreadsheet ID</label>
+        <input name="spreadsheet_id" id="spreadsheet_id" required autofocus class="form-control" spellcheck="false"  value="{{ spreadsheet_id }}">
+    </div>
+    <div class="mb-3">
+        <label for="sheet_id" class="form-label">Sheet ID</label>
+        <input name="sheet_id" id="sheet_id" required class="form-control" spellcheck="false" value="{{ sheet_id }}">
+    </div>
+    <div class="d-grid col-6 mx-auto">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
+{% endblock %}
