@@ -9,6 +9,6 @@ RUN pip3 install -r requirements.txt
 
 COPY ./expense_logger ./expense_logger
 COPY ./static ./static
-COPY ./.env ./credentials.json ./
+COPY ./.env ./credentials.json ./schema.sql ./
 
 COPY ./docker/app.ini ./
