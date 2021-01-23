@@ -3,14 +3,15 @@ from flask import session
 from expense_logger import db
 
 
-def process_user(response_credentials):
+def process_user(response_credentials, user_id):
     session['credentials'] = response_credentials
+    session['user_id'] = user_id
 
-    user_data = _get_existing_user_data(response_credentials['user_id'])
+    user_data = _get_existing_user_data(user_id)
     if user_data:
         _set_session(user_data)
     else:
-        _save_user(response_credentials)
+        _save_user(user_id, response_credentials)
 
 
 def _get_existing_user_data(user_id):
@@ -26,12 +27,12 @@ def _set_session(user_data):
     session['sheet_id'] = user_data['sheet_id']
 
 
-def _save_user(credentials):
+def _save_user(user_id, credentials):
     connection = db.get_db()
 
     connection.execute(
         'INSERT INTO user (google_user_id, refresh_token) VALUES (?, ?)',
-        (credentials['user_id'], credentials['refresh_token'])
+        (user_id, credentials['refresh_token'])
     )
 
     connection.commit()

@@ -95,7 +95,7 @@ def set_spreadsheet_config():
     session['sheet_id'] = sheet_id
 
     user.set_sheet_config(
-        session['credentials']['user_id'],
+        session['user_id'],
         spreadsheet_id,
         sheet_id
     )
@@ -120,13 +120,17 @@ def oauth2_callback():
 
     authorization_response = flask.request.url
 
-    response_credentials = oauth.get_credentials(
+    response_credentials = oauth.get_access_tokens(
         get_oauth_callback_url(),
         state,
         authorization_response
     )
 
-    user.process_user(response_credentials)
+    user_id = oauth.get_user_id(response_credentials)
+
+    credentials = oauth.credentials_to_dict(response_credentials)
+
+    user.process_user(credentials, user_id)
 
     return flask.redirect(flask.url_for('expense_form'))
 
@@ -135,6 +139,9 @@ def oauth2_callback():
 def clear_credentials():
     if 'credentials' in session:
         del session['credentials']
+
+    if 'user_id' in session:
+        del session['user_id']
 
     if 'spreadsheet_id' in session:
         del session['spreadsheet_id']
