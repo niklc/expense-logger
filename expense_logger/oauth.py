@@ -1,12 +1,17 @@
-import google_auth_oauthlib.flow
+from google_auth_oauthlib.flow import Flow
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 
 CLIENT_SECRETS_FILE = 'credentials.json'
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+SCOPES = [
+    'https://www.googleapis.com/auth/spreadsheets',
+    'openid'
+]
 
 
 def get_request_token(redirect_uri):
-    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+    flow = Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE,
         scopes=SCOPES
     )
@@ -19,8 +24,17 @@ def get_request_token(redirect_uri):
     )
 
 
-def get_access_token(callback_url, state, authorization_response):
-    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+def get_credentials(callback_url, state, authorization_response):
+    credentials = _get_access_tokens(
+        callback_url, state, authorization_response)
+
+    user_id = _get_user_id(credentials)
+
+    return _credentials_to_dict(credentials, user_id)
+
+
+def _get_access_tokens(callback_url, state, authorization_response):
+    flow = Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE,
         scopes=SCOPES,
         state=state
@@ -30,15 +44,25 @@ def get_access_token(callback_url, state, authorization_response):
 
     flow.fetch_token(authorization_response=authorization_response)
 
-    return _credentials_to_dict(flow.credentials)
+    return flow.credentials
 
 
-def _credentials_to_dict(credentials):
+def _get_user_id(credentials):
+    token = credentials.id_token
+    request = requests.Request()
+
+    id_info = id_token.verify_oauth2_token(token, request)
+
+    return id_info['sub']
+
+
+def _credentials_to_dict(credentials, user_id):
     return {
         'token': credentials.token,
         'refresh_token': credentials.refresh_token,
         'token_uri': credentials.token_uri,
         'client_id': credentials.client_id,
         'client_secret': credentials.client_secret,
-        'scopes': credentials.scopes
+        'scopes': credentials.scopes,
+        'user_id': user_id
     }

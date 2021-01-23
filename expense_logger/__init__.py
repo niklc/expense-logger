@@ -6,13 +6,19 @@ from time import time
 import flask
 import dotenv
 
-from expense_logger import oauth, spreadsheet, credentials, spreadsheet_id
+from expense_logger import oauth, spreadsheet, credentials, spreadsheet_id, db, user
 
 
 dotenv.load_dotenv()
 
 app = flask.Flask(__name__, static_folder='../static')
-app.secret_key = os.getenv('SECRET_KEY')
+
+app.config.from_mapping(
+    SECRET_KEY=os.getenv('SECRET_KEY'),
+    DATABASE='expense_logger.sqlite',
+)
+
+db.init_app(app)
 
 
 @app.before_request
@@ -44,13 +50,15 @@ def post_expense():
     entry_spreadsheet_id = spreadsheet_id.get_spreadsheet_id()
 
     timestamp = int(time())
-    entry_datetime_with_timezone = datetime.now().astimezone(timezone('Europe/Riga')).strftime('%Y-%m-%d %H:%M:%S')
+    entry_datetime_with_timezone = datetime.now().astimezone(
+        timezone('Europe/Riga')).strftime('%Y-%m-%d %H:%M:%S')
 
     row = [timestamp, entry_datetime_with_timezone, amount, description]
 
     spreadsheet.append_row(entry_spreadsheet_id, row)
 
     return flask.redirect(flask.url_for('expense_form'))
+
 
 @app.route('/set-spreadsheet', methods=['GET'])
 def spreadsheet_form():
@@ -84,13 +92,13 @@ def oauth2_callback():
 
     authorization_response = flask.request.url
 
-    response_credentials = oauth.get_access_token(
+    response_credentials = oauth.get_credentials(
         get_oauth_callback_url(),
         state,
         authorization_response
     )
 
-    credentials.set_credentials(response_credentials)
+    user.process_user(response_credentials)
 
     return flask.redirect(flask.url_for('expense_form'))
 
